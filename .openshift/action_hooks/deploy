@@ -70,6 +70,41 @@ ln -sf ${OPENSHIFT_DATA_DIR}uploads   ${OPENSHIFT_REPO_DIR}php/wp-content/
 
 cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/wp-config.php ${dest_dir}/wp-config.php
 
+# Use repository bibtexbrowser codes if exist 
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/bibtexbrowser.css ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/bibtexbrowser.css ${dest_dir}/bibtexbrowser.css
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/bibtexbrowser.local.php ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/bibtexbrowser.local.php ${dest_dir}/bibtexbrowser.local.php
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/bibtexbrowser.php ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/bibtexbrowser.php ${dest_dir}/bibtexbrowser.php
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/ICIQmembers.bib ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/ICIQmembers.bib ${dest_dir}/ICIQmembers.bib
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/AuthorLinks.bib ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/AuthorLinks.bib ${dest_dir}/AuthorLins.bib
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/publib.php ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/publib.php ${dest_dir}/publib.php
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/pubstyle.php ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/pubstyle.php ${dest_dir}/pubstyle.php
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/pubframeset.html ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/pubframeset.html ${dest_dir}/pubframeset.html
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/pubmenu.php ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/pubmenu.php ${dest_dir}/pubmenu.php
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/puboutput.php ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/puboutput.php ${dest_dir}/puboutput.php
+fi
+if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/pubelem.php ]; then
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/pubelem.php ${dest_dir}/pubelem.php
+fi
+
 
 # Use repository htaccess if exists 
 if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/.htaccess ]; then

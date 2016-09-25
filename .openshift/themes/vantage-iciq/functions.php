@@ -340,8 +340,11 @@ function iciq_biblib_func( $atts, $content = null ) {
 add_shortcode('iciq_biblib', 'iciq_biblib_func');
 
 
-
-
+// The following adds short code to display a frameset of bibtex library for publications.
+function iciq_frameset_func( ) {
+	include( 'pubframeset.html' );
+}
+add_shortcode('iciq_frameset', 'iciq_frameset_func');
 
 
 // The following will change the iCal and Google Calendar buttons in The Event Plugin, and add the Outlook button to export Events.
