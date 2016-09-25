@@ -30,7 +30,7 @@
 /* .bibtitle { font-weight:bold; } */
 .bibbooktitle { font-style:italic; }
 /* .bibmenu {display:none} */ /* disables the [bibtex] and the like */
-/* .bibanchor {display:none} */ /* disables the index [1] or [Name2010], etc. depending on the value of the configuration value ABBRV_TYPE and BIBTEXBROWSER_LAYOUT
+/* .bibanchor {display:none}  /* disables the index [1] or [Name2010], etc. depending on the value of the configuration value ABBRV_TYPE and BIBTEXBROWSER_LAYOUT
 /* .theader {display:none} */
 /* .sheader {display:none} */  /* disables the year header e.g., 2001 */
 

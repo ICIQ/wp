@@ -10,7 +10,7 @@
     define('BIBTEXBROWSER_CSS', '/bibtexbrowser.css');
     define('BIBTEXBROWSER_URL',''); //Get the individual bib pages embedded.
     define('METADATA_EPRINTS',true);
-    define('ABBRV_TYPE','index');
+    define('ABBRV_TYPE','year');
     define('BIBTEXBROWSER_LAYOUT','table');
     // define('BIBTEXBROWSER_EMBEDDED_WRAPPER', 'CustomWrapper');
     // define('BIBTEXBROWSER_DEFAULT_TEMPLATE','CustomHTMLTemplate');
