@@ -14,15 +14,6 @@
 	}
 
 	/***
-	***	@change birth date label in view
-	***/
-	add_filter('um_view_label_birth_date', 'um_view_label_birth_date');
-	function um_view_label_birth_date( $label ) {
-		$label = __('Age','ultimatemember');
-		return $label;
-	}
-
-	/***
 	***	@outputs a soundcloud track
 	***/
 	add_filter('um_profile_field_filter_hook__soundcloud_track', 'um_profile_field_filter_hook__soundcloud_track', 99, 2);
@@ -96,8 +87,11 @@
 	***	@last login date
 	***/
 	add_filter('um_profile_field_filter_hook__last_login', 'um_profile_field_filter_hook__last_login', 99, 2);
+	add_filter('um_profile_field_filter_hook___um_last_login', 'um_profile_field_filter_hook__last_login', 99, 2);
 	function um_profile_field_filter_hook__last_login( $value, $data ) {
+
 		$value = sprintf( __('Last login: %s','ultimatemember'), um_user_last_login( um_user('ID') ) );
+		
 		return $value;
 	}
 
@@ -373,3 +367,20 @@
 
 		return $options;
 	}
+    
+
+    /**
+     * Filter non-UTF8 strings
+     * @param  string $value 
+     * @return string
+     * @uses hook filter: um_field_non_utf8_value
+     */
+    add_filter('um_field_non_utf8_value','um_field_non_utf8_value');
+    function um_field_non_utf8_value( $value ){
+    	
+    	if( ! preg_match('/[^\\p{Common}\\p{Latin}]/u', $value ) ){
+								$value = htmlentities( $value );
+		}
+
+		return $value;
+    }

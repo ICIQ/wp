@@ -69,7 +69,7 @@ if ( !class_exists( 'PT_CV_Asset' ) ) {
 		static function style() {
 			return array(
 				'bootstrap'			 => array(
-					'src' => plugins_url( 'assets/bootstrap/css/bootstrap.custom.min.css', PT_CV_FILE ),
+					'src' => plugins_url( 'public/assets/css/bootstrap.custom.min.css', PT_CV_FILE ),
 				),
 				'select2'			 => array(
 					'src' => plugins_url( 'assets/select2/select2.min.css', PT_CV_FILE ),
@@ -88,7 +88,7 @@ if ( !class_exists( 'PT_CV_Asset' ) ) {
 		static function script() {
 			return array(
 				'bootstrap'	 => array(
-					'src'	 => plugins_url( 'assets/bootstrap/js/bootstrap.custom.min.js', PT_CV_FILE ),
+					'src'	 => plugins_url( 'public/assets/js/bootstrap.custom.min.js', PT_CV_FILE ),
 					'deps'	 => array( 'jquery' ),
 				),
 				'select2'	 => array(

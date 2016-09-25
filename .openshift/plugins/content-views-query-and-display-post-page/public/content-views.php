@@ -41,8 +41,7 @@ class PT_Content_Views {
 		// Load plugin text domain
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ), 11 );
 
-		// Init session
-		add_action( 'init', array( $this, 'register_session' ), 1 );
+		add_action( 'init', array( 'CV_Session', 'start' ) );
 
 		// Register content
 		add_action( 'init', array( $this, 'content_register' ) );
@@ -227,15 +226,6 @@ class PT_Content_Views {
 	}
 
 	/**
-	 * Start SESSION
-	 */
-	public function register_session() {
-		if ( !session_id() && !headers_sent() && @is_writable( session_save_path() ) ) {
-			session_start();
-		}
-	}
-
-	/**
 	 * Load the plugin text domain for translation.
 	 *
 	 * @since    1.0.0
@@ -344,28 +334,9 @@ class PT_Content_Views {
 	}
 
 	/**
-	 * Update view count
-	 *
-	 * @global type $post
-	 * @return void
-	 */
-	public static function _update_view_count() {
-		global $post;
-		if ( !isset( $post ) || !is_object( $post ) ) {
-			return;
-		}
-		if ( is_single( $post->ID ) ) {
-			PT_CV_Functions::post_update_view_count( $post->ID );
-		}
-	}
-
-	/**
 	 * Custom actions at head
 	 */
 	public function head_actions() {
-		// Update View count
-		self::_update_view_count();
-
 		// Initialize global variables
 		global $pt_cv_glb, $pt_cv_views, $pt_cv_id;
 		$pt_cv_glb	 = array();

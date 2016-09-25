@@ -21,6 +21,7 @@
 .pt-wrap input[type=number] {
 	height: 34px;
 }
+body {background-color: #fff}
 
 /* Fix Bootstrap box-sizing "border-box" problem */
 .pt-wrap *,
@@ -65,6 +66,13 @@ html {
 }
 
 /* Other settings */
+.pt-cv-caution {
+	background-color: #F44336;
+	color: #fff;
+	padding: 5px 15px;
+	margin-bottom: 1px;
+	text-align: center;
+}
 .hide {
 	display: none;
 }
@@ -97,6 +105,7 @@ html {
 
 .preview-wrapper .text-muted {
 	margin-top: 8px;
+	font-size: 14px;
 }
 
 .pt-wrap h2 {
@@ -213,6 +222,7 @@ html {
 
 /* Preview */
 #pt-cv-preview-box {
+	resize: vertical;
 	margin-bottom: 5px;
 	height:        300px;
 	padding:       20px;
@@ -309,6 +319,7 @@ html {
     background-color: #d9edf7;
     border-color: #bce8f1
 }
+.pt-wrap .alert {text-align: center}
 
 @media (max-width: 991px) {
     #pt-cv-form-view .nav .glyphicon {

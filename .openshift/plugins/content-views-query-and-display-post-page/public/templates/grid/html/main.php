@@ -9,32 +9,24 @@
  * @link      http://www.contentviewspro.com/
  * @copyright 2014 PT Guy
  */
-$html = array();
+$html			 = array();
+$o_fields_html	 = $fields_html;
+$layout			 = $dargs[ 'layout-format' ];
 
-$layout = $dargs[ 'layout-format' ];
-
-// Prevent the case: there are 2 columns but have not setting for thumbnail position
 if ( $layout == '2-col' && !isset( $dargs[ 'field-settings' ][ 'thumbnail' ] ) ) {
 	$layout = '1-col';
 }
 
-switch ( $layout ) {
-	case '1-col':
-		foreach ( $fields_html as $field_html ) {
-			$html[] = $field_html;
-		}
-		break;
-	case '2-col':
+if ( $layout == '2-col' ) {
+	$thumbnail = $fields_html[ 'thumbnail' ];
+	unset( $fields_html[ 'thumbnail' ] );
 
-		// Thumbnail html
-		$html[] = $fields_html[ 'thumbnail' ];
+	if ( apply_filters( PT_CV_PREFIX_ . '2col_separate', false ) ) {
+		$fields_html = array( sprintf( '<div class="%s">%s</div>', PT_CV_PREFIX . '2colse', implode( '', $fields_html ) ) );
+	}
 
-		// Other fields html
-		unset( $fields_html[ 'thumbnail' ] );
-		$others_html = implode( "\n", $fields_html );
-		$html[]		 = $others_html;
-
-		break;
+	array_unshift( $fields_html, $thumbnail );
 }
 
-echo implode( "\n", $html );
+$html = $fields_html;
+echo apply_filters( PT_CV_PREFIX_ . 'grid_item', implode( "\n", $html ), $o_fields_html );

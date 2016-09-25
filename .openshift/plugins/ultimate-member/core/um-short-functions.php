@@ -203,8 +203,8 @@
 		);
 
 		$replace = apply_filters('um_template_tags_replaces_hook', $replace);
-
-		$content = wp_kses_decode_entities( str_replace($search, $replace, $content) );
+        
+        $content = wp_kses_decode_entities( str_replace($search, $replace, $content) );
 
 		if ( isset( $args['tags'] ) && isset( $args['tags_replace'] ) ) {
 			$content = str_replace($args['tags'], $args['tags_replace'], $content);
@@ -268,18 +268,45 @@ function um_user_ip() {
 		if ( !isset( $data['conditions'] ) ) return true;
 
 		$state = 1;
-
+	
 		foreach( $data['conditions'] as $k => $arr ) {
 			if ( $arr[0] == 'show' ) {
 
 				$state = 1;
 				$val = $arr[3];
 				$op = $arr[2];
-				$field = um_profile($arr[1]);
 
+				if( strstr( $arr[1] , 'role_') ){
+					$arr[1] = 'role';
+				}
+
+				$field = um_profile( $arr[1] );
+				
 				switch( $op ) {
-					case 'equals to': if ( $field != $val ) $state = 0; break;
-					case 'not equals': if ( $field == $val ) $state = 0; break;
+					case 'equals to': 
+
+						if( is_serialized( $field ) ){
+							if ( ! in_array( $val , unserialize( $field ) ) ) {
+								$state = 0; 
+							}
+						}else{
+							if ( $field != $val ) {
+								$state = 0; 
+							}
+						}
+						
+					break;
+					case 'not equals': 
+						if( is_serialized( $field ) ){
+							if ( in_array( $val , unserialize( $field ) ) ) {
+								$state = 0; 
+							}
+						}else{
+							if ( $field == $val ) {
+								$state = 0; 
+							}
+						}
+					break;
 					case 'empty': if ( $field ) $state = 0; break;
 					case 'not empty': if ( !$field ) $state = 0; break;
 					case 'greater than': if ( $field <= $val ) $state = 0; break;
@@ -296,8 +323,28 @@ function um_user_ip() {
 				$field = um_profile($arr[1]);
 
 				switch( $op ) {
-					case 'equals to': if ( $field != $val ) $state = 1; break;
-					case 'not equals': if ( $field == $val ) $state = 1; break;
+					case 'equals to': 
+						if( is_serialized( $field ) ){
+							if ( ! in_array( $val , unserialize( $field ) ) ) {
+								$state = 1; 
+							}
+						}else{
+							if ( $field != $val ) {
+								$state = 1; 
+							}
+						}
+					break;
+					case 'not equals': 
+						if( is_serialized( $field ) ){
+							if ( in_array( $val , unserialize( $field ) ) ) {
+								$state = 1; 
+							}
+						}else{
+							if ( $field == $val ) {
+								$state = 1; 
+							}
+						}
+					break;
 					case 'empty': if ( $field ) $state = 1; break;
 					case 'not empty': if ( !$field ) $state = 1; break;
 					case 'greater than': if ( $field <= $val ) $state = 1; break;
@@ -364,7 +411,7 @@ function um_user_ip() {
 					$v = um_user_uploads_uri() . $file;
 				}
 
-				if ( !strstr( $k, 'user_pass' ) && $k != 'g-recaptcha-response' && $k != 'request' ) {
+				if ( !strstr( $k, 'user_pass' ) && ! in_array( $k, array('g-recaptcha-response','request','_wpnonce','_wp_http_referer') ) ) {
 
 					if ( is_array($v) ) {
 						$v = implode(',', $v );
@@ -631,7 +678,7 @@ function um_profile_id() {
 		$value = '';
 		if ( isset($_REQUEST['um_search']) ) {
 			$query = $ultimatemember->permalinks->get_query_array();
-			if ( $query[ $filter ] != '' ) {
+			if ( isset( $query[ $filter ] ) && $query[ $filter ] != '' ) {
 				$value = stripslashes_deep( $query[ $filter ] );
 			}
 		}
@@ -1055,8 +1102,8 @@ function um_get_option($option_id) {
 	global $ultimatemember;
 	if ( !isset( $ultimatemember->options ) ) return '';
 	$um_options = $ultimatemember->options;
-	if ( isset($um_options[$option_id]) && !empty( $um_options[$option_id] ) )	{
-		return $um_options[$option_id];
+	if ( isset( $um_options[ $option_id ] ) && !empty( $um_options[ $option_id ] ) )	{
+		return apply_filters("um_get_option_filter__{$option_id}", $um_options[ $option_id ] );
 	}
 
 	switch($option_id){
@@ -1131,11 +1178,15 @@ function um_fetch_user( $user_id ) {
 	***/
 	function um_profile( $key ){
 		global $ultimatemember;
-		if (isset( $ultimatemember->user->profile[$key] ) && !empty( $ultimatemember->user->profile[$key] ) ){
-			return $ultimatemember->user->profile[$key];
+		
+		if (isset( $ultimatemember->user->profile[ $key ] ) && !empty( $ultimatemember->user->profile[ $key ] ) ){
+			$value = apply_filters("um_profile_{$key}__filter", $ultimatemember->user->profile[ $key ] );
 		} else {
-			return false;
+			$value = apply_filters("um_profile_{$key}_empty__filter", false );
 		}
+
+		return $value;
+			
 	}
 
 	/***
@@ -1291,8 +1342,10 @@ function um_fetch_user( $user_id ) {
 	function um_get_default_cover_uri() {
 		$uri = um_get_option('default_cover');
 		$uri = $uri['url'];
-		if ( $uri )
+		if ( $uri ){
+			$uri = apply_filters('um_get_default_cover_uri_filter', $uri );
 			return $uri;
+		}
 		return '';
 	}
 
@@ -1305,16 +1358,34 @@ function um_fetch_user( $user_id ) {
 			default:
 
 				$value = um_profile($data);
-
+				
 				if ( $ultimatemember->validation->is_serialized( $value ) ) {
 					$value = unserialize( $value );
 				}
 
-				if( $data == 'role' ){
-					return strtolower($value);
+				if( in_array( $data, array('role','gender') ) ){
+					if( is_array( $value ) ){
+						$value = implode(",", $value );
+					}
+					return $value;
 				}
 
 				return $value;
+				break;
+
+			case 'first_name':
+			case 'last_name':
+
+				$name = um_profile( $data );
+
+				if( um_get_option('force_display_name_capitlized') ){
+					$name = implode('-', array_map('ucfirst', explode('-', $name ) ) );
+				}
+
+				$name = apply_filters("um_user_{$data}_case", $name );
+
+				return $name;
+
 				break;
 
 			case 'full_name':
@@ -1351,7 +1422,7 @@ function um_fetch_user( $user_id ) {
 				$f_and_l_initial = $ultimatemember->validation->safe_name_in_url( $f_and_l_initial );
 
 				if( um_get_option('force_display_name_capitlized') ){
-					$name = ucwords( strtolower( $f_and_l_initial ) ); 
+					$name = implode('-', array_map('ucfirst', explode('-', $f_and_l_initial ) ) ); 
 				}else{
 					$name = $f_and_l_initial;
 				}
@@ -1440,7 +1511,7 @@ function um_fetch_user( $user_id ) {
 				}
 
 				if( um_get_option('force_display_name_capitlized') ){
-					$name = ucwords( strtolower( $name ) ); 
+					$name = implode('-', array_map('ucfirst', explode('-', $name ) ) );
 				}
 
 				return apply_filters('um_user_display_name_filter', $name, um_user('ID'), ( $attrs == 'html' ) ? 1 : 0 );
@@ -1510,13 +1581,19 @@ function um_fetch_user( $user_id ) {
 				break;
 
 			case 'cover_photo':
+				
+				$is_default = false;
+
 				if ( um_profile('cover_photo') ) {
 					$cover_uri = um_get_cover_uri( um_profile('cover_photo'), $attrs );
 				} else if( um_profile('synced_cover_photo') ) {
 					$cover_uri = um_profile('synced_cover_photo');
 				}else{
 					$cover_uri = um_get_default_cover_uri();
+					$is_default = true;
 				}
+
+				$cover_uri = apply_filters('um_user_cover_photo_uri__filter', $cover_uri, $is_default, $attrs );
 				
 				if ( $cover_uri )
 					return '<img src="'. $cover_uri .'" alt="" />';
@@ -1525,6 +1602,7 @@ function um_fetch_user( $user_id ) {
 					return '';
 
 				break;
+
 
 		}
 
@@ -1726,4 +1804,86 @@ function um_fetch_user( $user_id ) {
 	    }
 
 	    return $loop;
+	}
+
+	/**
+	 * Check if running local
+	 * @return boolean
+	 */
+	function um_core_is_local() {
+	    if( $_SERVER['HTTP_HOST'] == 'localhost'
+	        || substr($_SERVER['HTTP_HOST'],0,3) == '10.'
+	        || substr($_SERVER['HTTP_HOST'],0,7) == '192.168') return true;
+	    return false;
+	}
+
+	/**
+	 * Get user host
+	 *
+	 * Returns the webhost this site is using if possible
+	 *
+	 * @since 1.3.68
+	 * @return mixed string $host if detected, false otherwise
+	 */
+	function um_get_host() {
+		$host = false;
+
+		if( defined( 'WPE_APIKEY' ) ) {
+			$host = 'WP Engine';
+		} elseif( defined( 'PAGELYBIN' ) ) {
+			$host = 'Pagely';
+		} elseif( DB_HOST == 'localhost:/tmp/mysql5.sock' ) {
+			$host = 'ICDSoft';
+		} elseif( DB_HOST == 'mysqlv5' ) {
+			$host = 'NetworkSolutions';
+		} elseif( strpos( DB_HOST, 'ipagemysql.com' ) !== false ) {
+			$host = 'iPage';
+		} elseif( strpos( DB_HOST, 'ipowermysql.com' ) !== false ) {
+			$host = 'IPower';
+		} elseif( strpos( DB_HOST, '.gridserver.com' ) !== false ) {
+			$host = 'MediaTemple Grid';
+		} elseif( strpos( DB_HOST, '.pair.com' ) !== false ) {
+			$host = 'pair Networks';
+		} elseif( strpos( DB_HOST, '.stabletransit.com' ) !== false ) {
+			$host = 'Rackspace Cloud';
+		} elseif( strpos( DB_HOST, '.sysfix.eu' ) !== false ) {
+			$host = 'SysFix.eu Power Hosting';
+		} elseif( strpos( $_SERVER['SERVER_NAME'], 'Flywheel' ) !== false ) {
+			$host = 'Flywheel';
+		} else {
+			// Adding a general fallback for data gathering
+			$host = 'DBH: ' . DB_HOST . ', SRV: ' . $_SERVER['SERVER_NAME'];
+		}
+
+		return $host;
+	}
+
+	/**
+	 * Let To Num
+	 *
+	 * Does Size Conversions
+	 *
+	 * @since 1.3.68
+	 * @author Chris Christoff
+	 *
+	 * @param unknown $v
+	 * @return int|string
+	 */
+	function um_let_to_num( $v ) {
+		$l   = substr( $v, -1 );
+		$ret = substr( $v, 0, -1 );
+
+		switch ( strtoupper( $l ) ) {
+			case 'P': // fall-through
+			case 'T': // fall-through
+			case 'G': // fall-through
+			case 'M': // fall-through
+			case 'K': // fall-through
+				$ret *= 1024;
+				break;
+			default:
+				break;
+		}
+
+		return $ret;
 	}

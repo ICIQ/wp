@@ -210,10 +210,14 @@
 						$ultimatemember->form->add_error($key, sprintf(__('Your %s must contain less than %s characters','ultimatemember'), $array['label'], $array['max_chars']) );
 						}
 					}
-
-					if ( isset( $array['html'] ) && $array['html'] == 0 ) {
-						if ( wp_strip_all_tags( $args[$key] ) != trim( $args[$key] ) ) {
-							$ultimatemember->form->add_error($key, __('You can not use HTML tags here','ultimatemember') );
+                     
+                    $profile_show_html_bio = um_get_option('profile_show_html_bio');
+					
+					if(  $profile_show_html_bio == 1 && $key !== "description" ){
+						if ( isset( $array['html'] ) && $array['html'] == 0 ) {
+							if ( wp_strip_all_tags( $args[$key] ) != trim( $args[$key] ) ) {
+								$ultimatemember->form->add_error($key, __('You can not use HTML tags here','ultimatemember') );
+							}
 						}
 					}
 
@@ -410,6 +414,27 @@
 									}
 								}
 							break;
+							
+							case 'alphabetic':
+
+								if ( $args[$key] != '' ) {
+
+									if( ! ctype_alpha( str_replace(' ', '', $args[$key] ) ) ){
+									   $ultimatemember->form->add_error( $key , __('You must provide alphabetic letters','ultimatemember') );
+									}
+								}
+							break;
+
+							case 'lowercase':
+
+								if ( $args[$key] != '' ) {
+
+									if( ! ctype_lower( str_replace(' ', '',$args[$key] ) ) ){
+									   $ultimatemember->form->add_error( $key , __('You must provide lowercase letters.','ultimatemember') );
+									}
+								}
+
+							break;
 
 						}
 
@@ -418,10 +443,16 @@
 				}
 
 				if ( isset( $args['description'] ) ) {
+					
 					$max_chars = um_get_option('profile_bio_maxchars');
-					if ( strlen( utf8_decode( $args['description'] ) ) > $max_chars && $max_chars ) {
-						$ultimatemember->form->add_error('description', sprintf(__('Your user description must contain less than %s characters','ultimatemember'), $max_chars ) );
+					$profile_show_bio = um_get_option('profile_show_bio');
+
+					if( $profile_show_bio ){
+						if ( strlen( utf8_decode( $args['description'] ) ) > $max_chars && $max_chars  ) {
+								$ultimatemember->form->add_error('description', sprintf(__('Your user description must contain less than %s characters','ultimatemember'), $max_chars ) );
+						}
 					}
+
 				}
 
 			} // end if ( isset in args array )

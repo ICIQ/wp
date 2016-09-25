@@ -139,7 +139,8 @@ if ( !class_exists( 'PT_CV_Hooks' ) ) {
 			// In CV: apply for Grid only
 			if ( PT_CV_Functions::get_global_variable( 'view_type' ) === 'grid' ) {
 				// If was not applied in CVPro
-				if ( array_key_exists( 'pt_cv_item_col_class', $GLOBALS[ 'wp_filter' ] ) && count( $GLOBALS[ 'wp_filter' ][ 'pt_cv_item_col_class' ] ) == 1 ) {
+				$key = PT_CV_PREFIX_ . 'item_col_class';
+				if ( array_key_exists( $key, $GLOBALS[ 'wp_filter' ] ) && count( $GLOBALS[ 'wp_filter' ][ $key ] ) == 1 ) {
 					$tablet_col	 = (int) PT_CV_Functions::setting_value( PT_CV_PREFIX . 'resp-tablet-number-columns' );
 					$mobile_col	 = (int) PT_CV_Functions::setting_value( PT_CV_PREFIX . 'resp-number-columns' );
 

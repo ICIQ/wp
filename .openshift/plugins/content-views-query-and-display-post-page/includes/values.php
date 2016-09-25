@@ -322,7 +322,7 @@ if ( !class_exists( 'PT_CV_Values' ) ) {
 				''			 => sprintf( '- %s -', __( 'Select' ) ),
 				'ID'		 => __( 'ID', 'content-views-query-and-display-post-page' ),
 				'title'		 => __( 'Title' ),
-				'date'		 => __( 'Created date', 'content-views-query-and-display-post-page' ),
+				'date'		 => __( 'Published date', 'content-views-query-and-display-post-page' ),
 				'modified'	 => __( 'Modified date', 'content-views-query-and-display-post-page' ),
 			);
 
@@ -380,7 +380,7 @@ if ( !class_exists( 'PT_CV_Values' ) ) {
 		static function layout_format() {
 
 			$result = array(
-				'1-col'	 => __( '1 column (show all fields in one column)', 'content-views-query-and-display-post-page' ),
+				'1-col'	 => __( '1 column (show fields vertically)', 'content-views-query-and-display-post-page' ),
 				'2-col'	 => __( '2 columns (show thumbnail on the left/right side of other fields)', 'content-views-query-and-display-post-page' ),
 			);
 

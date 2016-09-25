@@ -201,15 +201,17 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 				}
 
 				$fields_html = apply_filters( PT_CV_PREFIX_ . 'fields_html', $fields_html, $post );
+				$content	 = apply_filters( PT_CV_PREFIX_ . 'view_type_custom_output', $content, $fields_html, $post );
+				if ( !$content ) {
+					// Get HTML content of view type, with specific style
+					$file_path = apply_filters( PT_CV_PREFIX_ . 'view_type_file', $view_type_dir . '/' . 'html' . '/' . $style . '.' . 'php' );
 
-				// Get HTML content of view type, with specific style
-				$file_path = apply_filters( PT_CV_PREFIX_ . 'view_type_file', $view_type_dir . '/' . 'html' . '/' . $style . '.' . 'php' );
-
-				if ( file_exists( $file_path ) ) {
-					ob_start();
-					// Include, not include_once
-					include $file_path;
-					$content = ob_get_clean();
+					if ( file_exists( $file_path ) ) {
+						ob_start();
+						// Include, not include_once
+						include $file_path;
+						$content = ob_get_clean();
+					}
 				}
 			}
 
@@ -249,6 +251,11 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 			return apply_filters( PT_CV_PREFIX_ . 'content_no_post_found_text', __( 'No posts found.' ) );
 		}
 
+		static function grid_item_wrap( $content_item ) {
+			$class = PT_CV_PREFIX . 'ifield';
+			return "<div class='$class'>$content_item</div>";
+		}
+
 		/**
 		 * Wrap content of all items
 		 *
@@ -284,6 +291,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 
 				// Grid
 				case 'grid':
+					$content_items = array_map( array( __CLASS__, 'grid_item_wrap' ), $content_items );
 					PT_CV_Html_ViewType::grid_wrapper( $content_items, $content );
 
 					break;
@@ -317,7 +325,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 			if ( apply_filters( PT_CV_PREFIX_ . 'wrap_in_page', true ) ) {
 				$cols		 = sprintf( 'data-cvc="%s"', (int) $dargs[ 'number-columns' ] );
 				$page_attr	 = apply_filters( PT_CV_PREFIX_ . 'page_attr', $cols, $view_type, $content_items );
-				$html		 = sprintf( '<div id="%s" class="%s" %s>%s</div>', PT_CV_PREFIX . 'page' . '-' . $current_page, PT_CV_PREFIX . 'page', $page_attr, $content_list );
+				$html		 = sprintf( '<div data-id="%s" class="%s" %s>%s</div>', PT_CV_PREFIX . 'page' . '-' . $current_page, PT_CV_PREFIX . 'page', $page_attr, $content_list );
 			} else {
 				$html = $content_list;
 			}
@@ -407,7 +415,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 					break;
 			}
 
-			return $html;
+			return apply_filters( PT_CV_PREFIX_ . 'item_' . $field_name, $html, $post );
 		}
 
 		/**
@@ -436,7 +444,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 				'<%1$s class="%2$s">%3$s</%1$s>', $tag, esc_attr( $title_class ), self::_field_href( $oargs, $post, $title )
 			);
 
-			return apply_filters( PT_CV_PREFIX_ . 'field_title_extra', $html, $post );
+			return $html;
 		}
 
 		/**
@@ -477,7 +485,7 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 					// Read more button
 					if ( apply_filters( PT_CV_PREFIX_ . 'field_content_readmore_enable', 1, $fargs[ 'content' ] ) ) {
 						// Leverage WordPress translation
-						$default_readmore	 = ucwords( rtrim( __( 'Read more...' ), '.' ) );
+						$default_readmore	 = !empty( $fargs[ 'content' ][ 'readmore-text' ] ) ? stripslashes( trim( $fargs[ 'content' ][ 'readmore-text' ] ) ) : ucwords( rtrim( __( 'Read more...' ), '.' ) );
 						$text				 = apply_filters( PT_CV_PREFIX_ . 'field_content_readmore_text', $default_readmore, $fargs[ 'content' ] );
 						$btn_class			 = apply_filters( PT_CV_PREFIX_ . 'field_content_readmore_class', 'btn btn-success', $fargs );
 						$readmore_btn .= self::_field_href( $oargs, $post, $text, PT_CV_PREFIX . 'readmore ' . $btn_class );
@@ -488,13 +496,11 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 					if ( $length > 0 ) {
 						$GLOBALS[ 'cv_excerpt_type' ] = 'content';
 
-						// Get manual excerpt, apply filters => modify $GLOBALS[ 'cv_excerpt_type' ] relatively
 						$full_excerpt = apply_filters( PT_CV_PREFIX_ . 'field_content_excerpt', get_the_content(), $fargs, $post );
 
 						// Limit length
 						if ( apply_filters( PT_CV_PREFIX_ . 'trim_excerpt', $GLOBALS[ 'cv_excerpt_type' ] == 'content' ) ) {
-							$trimmed_excerpt = PT_CV_Functions::cv_trim_words( $full_excerpt, $length );
-							$excerpt		 = apply_filters( PT_CV_PREFIX_ . 'trim_length_excerpt', $trimmed_excerpt, $full_excerpt, $length );
+							$excerpt = PT_CV_Functions::cv_trim_words( $full_excerpt, $length );
 						} else {
 							$excerpt = $full_excerpt;
 						}
@@ -537,29 +543,13 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 		 * @param string $content The HTML of <a> tag
 		 */
 		static function _field_href( $oargs, $post, $content, $defined_class = '' ) {
-
-			// Open in
-			$open_in = isset( $oargs[ 'open-in' ] ) ? $oargs[ 'open-in' ] : '_blank';
-
-			// Class of href
-			$href_class = apply_filters( PT_CV_PREFIX_ . 'field_href_class', array( $open_in, $defined_class ), $oargs );
-
-			// Custom data
+			$open_in	 = isset( $oargs[ 'open-in' ] ) ? $oargs[ 'open-in' ] : '_blank';
+			$href		 = apply_filters( PT_CV_PREFIX_ . 'field_href', get_permalink( $post->ID ), $post );
+			$href_class	 = apply_filters( PT_CV_PREFIX_ . 'field_href_class', array( $open_in, $defined_class ), $oargs );
 			$custom_attr = apply_filters( PT_CV_PREFIX_ . 'field_href_attrs', array(), $open_in, $oargs );
 
-			// Don't wrap link
-			$no_link = apply_filters( PT_CV_PREFIX_ . 'field_href_no_link', 0, $open_in );
-
-			$href = apply_filters( PT_CV_PREFIX_ . 'field_href', get_permalink( $post->ID ), $post );
-
-			// Change href
-			if ( $no_link && strpos( $defined_class, 'readmore' ) === false ) {
-				$href = 'javascript:void(0)';
-			}
-
-			// Generate a tag
 			$html = sprintf(
-				'<a href="%s" class="%s" target="%s" %s>%s</a>', $href, implode( ' ', array_filter( $href_class ) ), $open_in, implode( ' ', array_filter( $custom_attr ) ), $content
+				'<a href="%s" class="%s" target="%s" %s>%s</a>', $href, implode( ' ', $href_class ), $open_in, implode( ' ', $custom_attr ), $content
 			);
 
 			return $html;
@@ -754,11 +744,11 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 		 *
 		 * @param type   $max_num_pages The total of pages
 		 * @param type   $current_page  The current pages
-		 * @param string $session_id    The session ID of current view
+		 * @param string $sid    View ID
 		 *
 		 * @return type
 		 */
-		static function pagination_output( $max_num_pages, $current_page, $session_id ) {
+		static function pagination_output( $max_num_pages, $current_page, $sid ) {
 
 			$dargs = PT_CV_Functions::get_global_variable( 'dargs' );
 
@@ -773,9 +763,9 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 
 			if ( $type == 'normal' || $style == 'regular' ) {
 				$ul_class		 = implode( ' ', array( PT_CV_PREFIX . 'pagination', PT_CV_PREFIX . $type, 'pagination' ) );
-				$pagination_btn	 = sprintf( '<ul class="%s" data-totalpages="%s" data-sid="%s">%s</ul>', $ul_class, esc_attr( $max_num_pages ), esc_attr( $session_id ), PT_CV_Functions::pagination( $max_num_pages, $current_page ) );
+				$pagination_btn	 = sprintf( '<ul class="%s" data-totalpages="%s" data-sid="%s">%s</ul>', $ul_class, esc_attr( $max_num_pages ), esc_attr( $sid ), PT_CV_Functions::pagination( $max_num_pages, $current_page ) );
 			} else {
-				$pagination_btn = apply_filters( PT_CV_PREFIX_ . 'btn_more_html', $pagination_btn, $max_num_pages, $session_id );
+				$pagination_btn = apply_filters( PT_CV_PREFIX_ . 'btn_more_html', $pagination_btn, $max_num_pages, $sid );
 			}
 			// Add loading icon
 			$pagination_btn .= self::html_loading_img( 15, PT_CV_PREFIX . 'spinner' );
@@ -786,10 +776,6 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 			return $output;
 		}
 
-		/**
-		 * Get assets content of all selected view types in a page
-		 * by merging css files to public/assets/css/public.css, js files to public/assets/js/public.js
-		 */
 		static function assets_of_view_types() {
 			global $pt_cv_glb, $pt_cv_id;
 
@@ -834,19 +820,15 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 		 * Scripts for Preview & WP frontend
 		 */
 		static function frontend_scripts() {
-			PT_CV_Asset::enqueue( 'bootstrap' );
-
-			// Public script
 			PT_CV_Asset::enqueue(
-				'public', 'script', array(
-				'src'	 => plugins_url( 'public/assets/js/public.js', PT_CV_FILE ),
+				'content-views', 'script', array(
+				'src'	 => plugins_url( 'public/assets/js/cv.js', PT_CV_FILE ),
 				'deps'	 => array( 'jquery' ),
 				)
 			);
 
-			// Localize for Public script
 			PT_CV_Asset::localize_script(
-				'public', PT_CV_PREFIX_UPPER . 'PUBLIC', array(
+				'content-views', PT_CV_PREFIX_UPPER . 'PUBLIC', array(
 				'_prefix'			 => PT_CV_PREFIX,
 				'page_to_show'		 => apply_filters( PT_CV_PREFIX_ . 'pages_to_show', 5 ),
 				'_nonce'			 => wp_create_nonce( PT_CV_PREFIX_ . 'ajax_nonce' ),
@@ -858,9 +840,8 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 				) + apply_filters( PT_CV_PREFIX_ . 'public_localize_script_extra', array() )
 			);
 
-			// Localize for Pagination script
 			PT_CV_Asset::localize_script(
-				array( 'bootstrap', 'bootstrap-admin' ), PT_CV_PREFIX_UPPER . 'PAGINATION', array(
+				array( 'content-views', 'bootstrap-admin' ), PT_CV_PREFIX_UPPER . 'PAGINATION', array(
 				'first'			 => apply_filters( PT_CV_PREFIX_ . 'pagination_first', '&laquo;' ),
 				'prev'			 => apply_filters( PT_CV_PREFIX_ . 'pagination_prev', '&lsaquo;' ),
 				'next'			 => apply_filters( PT_CV_PREFIX_ . 'pagination_next', '&rsaquo;' ),
@@ -884,11 +865,9 @@ if ( !class_exists( 'PT_CV_Html' ) ) {
 		 * @global bool $is_IE
 		 */
 		static function frontend_styles() {
-			PT_CV_Asset::enqueue( 'bootstrap', 'style' );
-
 			PT_CV_Asset::enqueue(
 				'public', 'style', array(
-				'src' => plugins_url( 'public/assets/css/public.css', PT_CV_FILE ),
+				'src' => plugins_url( 'public/assets/css/' . (!cv_is_damaged_style() ? 'cv.css' : 'cv.im.css'), PT_CV_FILE ),
 				)
 			);
 

@@ -12,7 +12,6 @@ $html		 = array();
 $random_id	 = PT_CV_Functions::string_random();
 $layout		 = $dargs[ 'layout-format' ];
 
-// Prevent the case: there are 2 columns but have not setting for thumbnail position
 if ( $layout == '2-col' && !isset( $dargs[ 'field-settings' ][ 'thumbnail' ] ) ) {
 	$layout = '1-col';
 }
@@ -20,31 +19,25 @@ if ( $layout == '2-col' && !isset( $dargs[ 'field-settings' ][ 'thumbnail' ] ) )
 $heading = isset( $fields_html[ 'title' ] ) ? $fields_html[ 'title' ] : '';
 unset( $fields_html[ 'title' ] );
 
-switch ( $layout ) {
-	case '1-col':
-		foreach ( $fields_html as $field_html ) {
-			$html[] = $field_html;
-		}
-		break;
-	case '2-col':
-		$thumbnail_html = $fields_html[ 'thumbnail' ];
+if ( $layout == '2-col' ) {
+	$thumbnail = $fields_html[ 'thumbnail' ];
+	unset( $fields_html[ 'thumbnail' ] );
 
-		// Other fields html
-		unset( $fields_html[ 'thumbnail' ] );
-		$others_html = implode( "\n", $fields_html );
+	if ( apply_filters( PT_CV_PREFIX_ . '2col_separate', false ) ) {
+		$fields_html = array( sprintf( '<div class="%s">%s</div>', PT_CV_PREFIX . '2colse', implode( '', $fields_html ) ) );
+	}
 
-		$html[]	 = $thumbnail_html;
-		$html[]	 = $others_html;
-
-		break;
+	array_unshift( $fields_html, $thumbnail );
 }
+
+$html			 = $fields_html;
 ?>
 
 <div class="panel-heading">
 	<a class="panel-title" data-toggle="collapse" data-parent="#<?php echo esc_attr( PT_CV_PREFIX_UPPER . 'ID' ); ?>" href="#<?php echo esc_attr( $random_id ); ?>">
 		<?php
 		// Able to allow some HTML tags here: span, strong...
-		$allowable_tags = (array) apply_filters( PT_CV_PREFIX_ . 'collapsible_heading_tags', array() );
+		$allowable_tags	 = (array) apply_filters( PT_CV_PREFIX_ . 'collapsible_heading_tags', array( '<b>', '<br>', '<code>', '<em>', '<i>', '<img>', '<big>', '<small>', '<span>', '<strong>', '<sub>', '<sup>', '<label>', '<cite>', ) );
 		echo strip_tags( $heading, implode( '', $allowable_tags ) );
 		?>
 	</a>

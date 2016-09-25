@@ -65,7 +65,7 @@ if ( !class_exists( 'PT_CV_Plugin' ) ) {
 
 			self::$options	 = get_option( PT_CV_OPTION_NAME );
 			?>
-			<form method="post" action="options.php">
+			<form method="post" action="options.php" class="cvform">
 				<?php
 				// This prints out all hidden setting fields
 				settings_fields( PT_CV_OPTION_NAME . '_group' );

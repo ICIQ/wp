@@ -58,6 +58,9 @@ if ( !class_exists( 'PT_Options_Framework' ) ) {
 		 * @param array  $dependence_ Global dependence array
 		 */
 		public static function _dependence_assign( $dependence, $random_id, &$dependence_ ) {
+			if ( !isset( $dependence[ 1 ] ) ) {
+				return;
+			}
 			$dependence_[ $dependence[ 0 ] ][] = array( $random_id, $dependence[ 1 ], isset( $dependence[ 2 ] ) ? $dependence[ 2 ] : '=' );
 		}
 
@@ -165,6 +168,18 @@ if ( !class_exists( 'PT_Options_Framework' ) ) {
 				$value = isset( $data[ $single_name ] ) ? $data[ $single_name ] : '';
 			} else {
 				$value = isset( $param[ 'std' ] ) ? $param[ 'std' ] : '';
+			}
+
+			if ( $value === '' && (isset( $param[ 'std' ] ) && $param[ 'std' ] !== '') ) {
+				if ( in_array( $param[ 'type' ], array( 'number', 'text', 'color' ) ) ) {
+					if ( $name !== PT_CV_PREFIX . 'limit' ) {
+						$value = $param[ 'std' ];
+					}
+				} else if ( in_array( $param[ 'type' ], array( 'radio', 'select' ) ) ) {
+					if ( !array_key_exists( '', $param[ 'options' ] ) ) {
+						$value = $param[ 'std' ];
+					}
+				}
 			}
 
 			return $value;

@@ -25,7 +25,6 @@ define( 'PT_CV_OPTION_NAME', PT_CV_PREFIX_ . 'options' );
 // Custom fields
 define( 'PT_CV_META_ID', '_' . PT_CV_PREFIX_ . 'id' );
 define( 'PT_CV_META_SETTINGS', '_' . PT_CV_PREFIX_ . 'settings' );
-define( 'PT_CV_META_VIEW_COUNT', '_' . PT_CV_PREFIX_ . 'view_count' );
 
 // Public assets directory
 define( 'PT_CV_PUBLIC_ASSETS', PT_CV_PATH . 'public/assets/' );
@@ -41,3 +40,12 @@ define( 'PT_CV_DEBUG', false );
 
 // Script error
 define( 'PT_CV_SOLVE_SCRIPT_ERROR', 'cv_solve_script_error_181' );
+/**
+ * Check if CV layout was damaged by theme/another plugin's style
+ * @since 1.8.7
+ * @return bool
+ */
+function cv_is_damaged_style() {
+	# Plugin: Divi Builder, v1.3.8
+	return apply_filters( PT_CV_PREFIX_ . 'damaged_style', defined( 'ET_BUILDER_PLUGIN_VERSION' ) );
+}

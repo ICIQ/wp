@@ -69,7 +69,7 @@ if ( !class_exists( 'PT_CV_Html_ViewType' ) ) {
 			$columns_item = array_chunk( $content_items, $columns, true );
 
 			// Get responsive class
-			$res_class = apply_filters( PT_CV_PREFIX_ . 'item_col_class', array(), 6 );
+			$res_class = apply_filters( PT_CV_PREFIX_ . 'item_col_class', array( $class ), 6 );
 
 			// Get HTML of each row
 			foreach ( $columns_item as $items_per_row ) {
@@ -81,7 +81,7 @@ if ( !class_exists( 'PT_CV_Html_ViewType' ) ) {
 					$_span_width = ( $count == $columns && $idx + 1 == $count ) ? $span_width_last : $span_width;
 
 					// Wrap content of item
-					$item_classes	 = array_merge( array( $span_class . $_span_width, $class ), $res_class );
+					$item_classes	 = array_merge( array( $span_class . $_span_width ), $res_class );
 					$item_class		 = implode( ' ', array_filter( $item_classes ) );
 					$row_html[]		 = PT_CV_Html::content_item_wrap( $content_item, $item_class, $post_id );
 
@@ -107,10 +107,11 @@ if ( !class_exists( 'PT_CV_Html_ViewType' ) ) {
 			$idx				 = 0;
 			$collapsible_list	 = array();
 			$open_first			 = PT_CV_Functions::setting_value( PT_CV_PREFIX . 'collapsible-open-first-item' );
+			$open_all			 = apply_filters( PT_CV_PREFIX_ . 'collapsible_open_all', false );
 
 			foreach ( $content_items as $post_id => $content_item ) {
 				// Replace class in body of collapsible item, to show one (now is the first item)
-				$class			 = ( $idx++ == 0 && $open_first === 'yes' ) ? 'in' : '';
+				$class			 = ( $open_all || ($idx++ == 0 && $open_first === 'yes') ) ? 'in' : '';
 				$content_item	 = str_replace( PT_CV_PREFIX_UPPER . 'CLASS', $class, $content_item );
 				$content_item	 = PT_CV_Html::content_item_wrap( $content_item, 'panel panel-default', $post_id );
 
@@ -170,7 +171,7 @@ if ( !class_exists( 'PT_CV_Html_ViewType' ) ) {
 
 			// Get wrapper class scrollable
 			$scrollable_class	 = apply_filters( PT_CV_PREFIX_ . 'scrollable_class', 'carousel slide' );
-			$content[]			 = sprintf( '<div id="%s" class="%s" data-ride="carousel" data-interval=%s>%s</div>', esc_attr( $wrapper_id ), esc_attr( $scrollable_class ), $interval, implode( "\n", $scrollable_html ) );
+			$content[]			 = sprintf( '<div id="%s" class="%s" data-ride="cvcarousel" data-interval=%s>%s</div>', esc_attr( $wrapper_id ), esc_attr( $scrollable_class ), $interval, implode( "\n", $scrollable_html ) );
 		}
 
 		/**

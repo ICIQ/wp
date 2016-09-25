@@ -39,9 +39,9 @@ PT_CV_Functions::view_submit();
 	if ( $id ) {
 		?>
 		<div>
-			<div class="view-code">For page, widget... editor: <input class="form-control" style="width: 190px;background-color: #ADFFAD;margin-right: 50px;" type="text" value="[pt_view id=&quot;<?php echo $id ?>&quot;]" onclick="this.select()" readonly=""></div>
-			<div class="view-code">For theme file: <input class="form-control" style="width: 370px;" type="text" value='&lt;?php echo do_shortcode("[pt_view id=<?php echo $id ?>]"); ?&gt;' onclick="this.select()" readonly=""></div>
-			<?php echo apply_filters( PT_CV_PREFIX_ . 'view_actions', '<a class="btn btn-info pull-right" target="_blank" href="http://www.contentviewspro.com/?utm_source=client&utm_medium=view">Get Pro version</a>', $id ) ?>
+			<div class="view-code">For page content, text widget... <input class="form-control" style="width: 190px;background-color: #ADFFAD;margin-right: 50px;" type="text" value="[pt_view id=&quot;<?php echo $id ?>&quot;]" onclick="this.select()" readonly=""></div>
+			<div class="view-code">For theme file <input class="form-control" style="width: 370px;" type="text" value='&lt;?php echo do_shortcode("[pt_view id=<?php echo $id ?>]"); ?&gt;' onclick="this.select()" readonly=""></div>
+			<?php echo apply_filters( PT_CV_PREFIX_ . 'view_actions', '<a class="btn btn-info pull-right" target="_blank" href="https://www.contentviewspro.com/pricing/?utm_source=client&utm_medium=view_header&utm_campaign=gopro">Get PRO Version</a>', $id ) ?>
 		</div>
 		<div class="clear"></div>
 		<?php
@@ -351,7 +351,7 @@ PT_CV_Functions::view_submit();
 												),
 											),
 										),
-										!get_option( 'pt_cv_version_pro' ) ? PT_CV_Settings::get_cvpro( sprintf( '<br>' . __( 'When you select any term above, it will not replace posts layout in term page (for example: %s) with layout of this View', 'content-views-query-and-display-post-page' ), '<code style="font-size: 11px;">http://yourdomain/category/selected_term/</code>' ), 10, null, true ) : '',
+										!get_option( 'pt_cv_version_pro' ) ? PT_CV_Settings::get_cvpro( sprintf( __( 'When you select any term above, it will not replace posts layout in term page (for example: %s) with layout of this View', 'content-views-query-and-display-post-page' ), '<code style="font-size: 11px;">http://yourdomain/category/selected_term/</code>' ), 12, null, true ) : '',
 										apply_filters( PT_CV_PREFIX_ . 'taxonomies_custom_settings', array() ),
 									), // End Taxonomies Settings
 									// Sort by Settings

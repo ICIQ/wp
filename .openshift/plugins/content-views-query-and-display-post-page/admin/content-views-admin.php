@@ -170,7 +170,7 @@ class PT_Content_Views_Admin {
 			// Bootstrap for Admin
 			PT_CV_Asset::enqueue(
 				'bootstrap-admin', 'style', array(
-				'src' => plugins_url( 'assets/bootstrap/css/bootstrap.full.css', PT_CV_FILE ),
+				'src' => plugins_url( 'public/assets/css/bootstrap.full.css', PT_CV_FILE ),
 				)
 			);
 
@@ -221,6 +221,7 @@ class PT_Content_Views_Admin {
 					'no_taxonomy'		 => __( 'There is no taxonomy for selected content type', 'content-views-query-and-display-post-page' ),
 					'pagination_disable' => __( 'Pagination is disabled when Limit = -1', 'content-views-query-and-display-post-page' ),
 					'prevent_click'		 => __( 'Opening a link is prevented in preview box', 'content-views-query-and-display-post-page' ),
+					'visible_shortcode'	 => __( 'If shortcode is visible in below panel, please click Save button, then paste View shortcode to a page and check', 'content-views-query-and-display-post-page' ),
 				),
 				'btn'				 => array(
 					'preview' => array(
@@ -238,7 +239,7 @@ class PT_Content_Views_Admin {
 			// Bootstrap for Admin
 			PT_CV_Asset::enqueue(
 				'bootstrap-admin', 'script', array(
-				'src' => plugins_url( 'assets/bootstrap/js/bootstrap.full.js', PT_CV_FILE ),
+				'src' => plugins_url( 'public/assets/js/bootstrap.full.js', PT_CV_FILE ),
 				)
 			);
 

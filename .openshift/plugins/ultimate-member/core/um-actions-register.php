@@ -33,6 +33,9 @@
 	add_action('um_add_user_frontend', 'um_add_user_frontend', 10);
 	function um_add_user_frontend($args){
 		global $ultimatemember;
+
+		unset( $args['user_id'] );
+		
 		extract($args);
 
 
@@ -67,7 +70,7 @@
 
 		$unique_userID = $ultimatemember->query->count_users() + 1;
 
-		if ( ! isset( $user_login ) ) {
+		if ( ! isset( $user_login ) ||  strlen( $user_login ) > 30 ) {
 			$user_login = 'user' . $unique_userID;
 		}
 
@@ -81,7 +84,8 @@
 
 
 		if( ! isset( $user_email ) ) {
-			$user_email = 'nobody' . $unique_userID . '@' . get_bloginfo('name');
+			$site_url = @$_SERVER['SERVER_NAME'];
+			$user_email = 'nobody' . $unique_userID . '@' . $site_url;
 		}
 
 
@@ -91,8 +95,9 @@
 
 		$args['submitted'] = array_merge( $args['submitted'], $creds);
 		$args = array_merge($args, $creds);
-
-
+		
+		unset( $args['user_id'] );
+		
 		do_action('um_before_new_user_register', $args);
 
 		$user_id = wp_create_user( $user_login, $user_password, $user_email );
@@ -106,9 +111,9 @@
 	***	@after adding a new user
 	***/
 	add_action('um_after_new_user_register', 'um_after_new_user_register', 10, 2);
-	function um_after_new_user_register($user_id, $args){
+	function um_after_new_user_register( $user_id, $args ){
 		global $ultimatemember, $pagenow;
-		extract($args);
+		extract( $args );
 
 		um_fetch_user( $user_id );
 
@@ -131,6 +136,8 @@
 		do_action('um_post_registration_save', $user_id, $args);
 
 		do_action('um_post_registration_listener', $user_id, $args);
+		
+		do_action('um_update_profile_full_name', $args );
 
 		do_action('um_post_registration', $user_id, $args);
 
@@ -140,7 +147,7 @@
 	***	@Update user's profile after registration
 	***/
 	add_action('um_post_registration_save', 'um_post_registration_save', 10, 2);
-	function um_post_registration_save($user_id, $args){
+	function um_post_registration_save( $user_id, $args ){
 		global $ultimatemember;
 
 		unset( $args['user_id'] );
@@ -155,7 +162,7 @@
 	***	@post-registration admin listender
 	***/
 	add_action('um_post_registration_listener', 'um_post_registration_listener', 10, 2);
-	function um_post_registration_listener($user_id, $args){
+	function um_post_registration_listener( $user_id, $args ){
 		global $ultimatemember;
 
 		if ( um_user('status') != 'pending' ) {
@@ -170,8 +177,9 @@
 	***	@post-registration procedure
 	***/
 	add_action('um_post_registration', 'um_post_registration', 10, 2);
-	function um_post_registration($user_id, $args){
+	function um_post_registration( $user_id, $args ){
 		global $ultimatemember;
+		unset(  $args['user_id'] );
 		extract($args);
 
 		$status = um_user('status');
@@ -188,12 +196,20 @@
 			if ( isset( $args['redirect_to'] ) ) {
 				exit( wp_redirect(  urldecode( $args['redirect_to'] ) ) );
 			}
+            
+            if ( $status == 'approved' ) {
 
-			if ( $status == 'approved' ) {
+				$ultimatemember->user->auto_login( $user_id );
+				$ultimatemember->permalinks->profile_url( true );
 
-				$ultimatemember->user->auto_login($user_id);
-				if ( um_user('auto_approve_act') == 'redirect_url' && um_user('auto_approve_url') !== '' ) exit( wp_redirect( um_user('auto_approve_url') ) );
-				if ( um_user('auto_approve_act') == 'redirect_profile' ) exit( wp_redirect( um_user_profile_url() ) );
+				do_action('um_registration_after_auto_login', $user_id );
+
+				if ( um_user('auto_approve_act') == 'redirect_url' && um_user('auto_approve_url') !== '' ){
+					exit( wp_redirect( um_user('auto_approve_url') ) );
+				}
+				if ( um_user('auto_approve_act') == 'redirect_profile' ){
+				    exit( wp_redirect( um_user_profile_url() ) );
+				}
 
 			}
 
@@ -207,6 +223,7 @@
 					$url = $ultimatemember->permalinks->get_current_url();
 					$url =  add_query_arg( 'message', esc_attr( $status ), $url );
 					$url =  add_query_arg( 'uid', esc_attr( um_user('ID') ), $url );
+					$url =  add_query_arg( 'um_form_id', esc_attr( $form_id ), $url );
 
 					exit( wp_redirect( $url ) );
 				}
@@ -223,7 +240,8 @@
 	add_action('um_user_registration', 'um_user_registration', 10);
 	function um_user_registration($args){
 		global $ultimatemember;
-
+         
+        unset( $args['user_id'] );
 		do_action('um_add_user_frontend', $args);
 
 	}
@@ -258,6 +276,8 @@
 		} else if( $use_global_settings == 1 ) {
 			$role = um_get_option('default_role');
 		}
+
+		if( empty( $role ) ) return;
 
 		$role = apply_filters('um_register_hidden_role_field', $role );
 		if( $role ){
