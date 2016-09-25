@@ -2,7 +2,7 @@
 /**
  * This template displays full width pages.
  *
- * @package vantage-cquic
+ * @package vantage-iciq
  * @since vantage 1.0
  * @license GPL 2.0
  * 
@@ -40,12 +40,12 @@ get_header('research_group'); ?>
 		
 			
                      <?php
-                               $_GET['bib']= '/faux/CQuICmembers.bib' ;
+                               $_GET['bib']= '/ICIQmembers.bib' ;
                                $_GET['all']=1;
                                /* if ($a['authors'] == 'all') {$_GET['all']=1;} 
                                      else {$_GET['author']=$authorlastnames;} */
                                $_GET['academic']=1;
-                               include( '/faux/bibtexbrowser.php' ); 
+                               include( '/bibtexbrowser.php' ); 
                      ?> 
 
 

@@ -2,7 +2,7 @@
 /**
  * This template displays full width pages.
  *
- * @package vantage-cquic
+ * @package vantage-iciq
  * @since vantage 1.0
  * @license GPL 2.0
  * 

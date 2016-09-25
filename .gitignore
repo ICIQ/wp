@@ -12,3 +12,4 @@ _garb.yml
 Gemfile.lock
 *.stackdump
 .Rhistory
+.fuse_*

@@ -22,7 +22,7 @@
 	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
 	<?php wp_head(); ?>
         <!-- Trying to fix ultimate member by manually forcing this stylesheet to be loaded -->
-        <link rel="stylesheet" id="um_minified-css" href="http://cquic.unm.edu/wp-content/plugins/ultimate-member/assets/css/um.min.css?ver=1.3.36" type="text/css" media="all">
+        <link rel="stylesheet" id="um_minified-css" href="http://www.iciq.tk/wp-content/plugins/ultimate-member/assets/css/um.min.css?ver=1.3.36" type="text/css" media="all">
 </head>
 
 <body <?php body_class(); ?>>
