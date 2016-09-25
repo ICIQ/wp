@@ -84,7 +84,7 @@ if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/ICIQmembers.bib ]; then
   cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/ICIQmembers.bib ${dest_dir}/ICIQmembers.bib
 fi
 if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/AuthorLinks.bib ]; then
-  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/AuthorLinks.bib ${dest_dir}/AuthorLins.bib
+  cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/AuthorLinks.bib ${dest_dir}/AuthorLinks.bib
 fi
 if [  -f ${OPENSHIFT_REPO_DIR}.openshift/config/publib.php ]; then
   cp -f ${OPENSHIFT_REPO_DIR}.openshift/config/publib.php ${dest_dir}/publib.php
