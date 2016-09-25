@@ -1,3 +1,3 @@
-<?php 
-include('bibtexbrowser.php'); 
+<?php
+include('bibtexbrowser.php');
 ?>
