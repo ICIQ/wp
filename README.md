@@ -93,3 +93,7 @@ You'll be prompted to set an admin password and name your WordPress site the fir
 page.
 
 [template]: https://hub.openshift.com/quickstarts/1-wordpress-4
+
+## Updates:
+The remote server has been updated to OpenShift3 on Oct 1st, 2017 with a new webhook set up on GitHub.
+
